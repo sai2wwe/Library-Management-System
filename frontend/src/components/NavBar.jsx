@@ -66,9 +66,9 @@ export default function NavBar() {
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link color="foreground" to="/github">
+          <a href="https://github.com/sai2wwe/LMS" target="blank">
             GitHub
-          </Link>
+          </a>
         </NavbarItem>
       </NavbarContent>
 
