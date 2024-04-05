@@ -64,7 +64,7 @@ export default function NavBar() {
       </NavbarBrand>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem isActive className="bg-white hover:bg-blue-700 rounded-lg">
+        <NavbarItem isActive className='hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 text-sm font-medium'>
           {role === "admin" ? (
             <Link to="/adminhome" aria-current="page" color="secondary">
               DashBoard
@@ -77,19 +77,19 @@ export default function NavBar() {
         </NavbarItem>
 
         {role !== "admin" && (
-          <NavbarItem>
+          <NavbarItem className='hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 text-sm font-medium'>
             <Link to="/books" aria-current="page" color="secondary">
               Books
             </Link>
           </NavbarItem>
         )}
 
-        <NavbarItem>
+        <NavbarItem className='hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 text-sm font-medium'>
           <Link to="/About" aria-current="page" color="secondary">
             About
           </Link>
         </NavbarItem>
-        <NavbarItem>
+        <NavbarItem className='hover:bg-gray-900 hover:text-white rounded-md px-3 py-2 text-sm font-medium'>
           <a
             href="https://github.com/sai2wwe/Library-Management-System"
             target="blank"
