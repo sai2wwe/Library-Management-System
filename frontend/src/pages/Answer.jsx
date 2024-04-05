@@ -48,7 +48,7 @@ export default function Answer() {
         }
       );
       if (!response.ok) {
-        console.log("Something went wrong!");
+        toast.error("Failed to add answer");
       }
       const data = await response.json();
       dispatchb({
@@ -57,15 +57,14 @@ export default function Answer() {
       });
       setAnswer("");
       onClose();
+      toast.success("Answer added successfully");
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to add answer");
       onClose();
     }
   };
 
   const handleUpvote = async (e, answerId) => {
-    // e.preventDefault();
-    console.table(answers)
     try {
       const response = await fetch(
         `http://localhost:5000/api/books/${bookId}/query/${queryId}/`,
@@ -117,7 +116,7 @@ export default function Answer() {
                   Answered by: {answer.user_name}
                 </Chip>
                 <p>{answer.answer}</p>
-                <p>upvotes: {answer.upvotes?.count}</p>
+                <p>upvotes: {answer.upvotes}</p>
                 <Button variant="flat" onPress={(e) => handleUpvote(e, answer._id)}>Upvote</Button>
               </CardBody>
             </Card>

@@ -41,7 +41,7 @@ export default function NavBar() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            authorization: `Bearer ${localStorage.getItem("token")}`,
+            "authorization": `Bearer ${localStorage.getItem("token")}`,
           },
         });
         if (!response.ok) {
@@ -64,7 +64,7 @@ export default function NavBar() {
       </NavbarBrand>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem isActive>
+        <NavbarItem isActive className="bg-white hover:bg-blue-700 rounded-lg">
           {role === "admin" ? (
             <Link to="/adminhome" aria-current="page" color="secondary">
               DashBoard
