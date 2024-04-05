@@ -17,9 +17,13 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!username.endsWith("@iiitkottayam.ac.in")) {
+      toast.error("Please enter a valid email(should be a iiitk email)");
+      return;
+    }
     console.table(username, password);
     if (!username || !password) {
-      setError("Please fill in all fields");
+      toast.error("Please fill in all fields");
       return;
     }
     if (password !== confirmpassword) {
@@ -48,12 +52,14 @@ export default function Signup() {
         type: "LOGIN",
         payload: { user: data.user, token: data.token },
       });
-      console.table(data);
-      setError(null);
       setLoading(false);
+      setError(null);
+      toast.success("Account created successfully");
     } catch (error) {
       setError(error.message);
-      console.error(error);
+      toast.error(`failed to create account (${error.message})`)
+      setLoading(false);
+      setError(null);
     }
   };
   return (
@@ -63,7 +69,7 @@ export default function Signup() {
         <CardHeader className="font-mono text-2xl"></CardHeader>
         <CardBody>
           <form
-            onSubmit={handleSubmit}
+            onSubmit={(e) => handleSubmit(e)}
             className="flex flex-col justify-center items-center m-8"
           >
             <div className="w-[400px] h-[360px] px-4 rounded-2xl flex flex-col gap-3 justify-center items-center bg-gradient-to-tr from-blue-500 to-purple-500 text-white shadow-lg">
@@ -109,8 +115,8 @@ export default function Signup() {
           </form>
         </CardBody>
         <CardFooter>
-          {error && toast.error(error)}
-          {loading && toast.loading("Loading...")}
+
+          {loading && toast.message("Loading...")}
         </CardFooter>
       </Card>
       <Toaster richColors position="top-right" closeButton />

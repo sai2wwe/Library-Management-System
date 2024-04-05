@@ -19,6 +19,18 @@ export default function Login() {
     setError(null);
     setLoading(true);
 
+    if (!username || !password ) {
+      setError("Please fill in all fields");
+      setLoading(false);
+      return;
+    }
+
+    if (!username.endsWith("@gmail.com")) {
+      setError("Invalid email (username must end with @gmail.com)");
+      setLoading(false);
+      return;
+    }
+
     console.log(username, password, "login");
     try {
       const response = await fetch("http://localhost:5000/api/users/login", {
@@ -57,6 +69,7 @@ export default function Login() {
             <div className="w-[380px] h-[270px] px-4 rounded-2xl flex flex-col gap-3 justify-center items-center bg-gradient-to-tr from-blue-500 to-purple-500 text-white">
               <label htmlFor="username">Username:</label>
               <Input
+                className="border border-white rounded"
                 type="email"
                 placeholder="random@gmail.com"
                 value={username}
@@ -73,6 +86,7 @@ export default function Login() {
               />
               <div className="flex justify-around items-center gap-16">
                 <Button
+                className="rounded-md bg-blue-700 w-max"
                   variant="shadow"
                   color="secondary"
                   type="submit"

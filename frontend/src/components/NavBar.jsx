@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import useLogout from "../Auth/useLogout.jsx";
 import { AuthContext } from "../context/AuthContext";
 import { Link } from "react-router-dom";
@@ -16,6 +16,7 @@ import {
   Avatar,
   Button,
 } from "@nextui-org/react";
+import { useBookContext } from "../hooks/useBookContext.jsx";
 const AcmeLogo = () => (
   <svg fill="none" height="36" viewBox="0 0 32 32" width="36">
     <path
@@ -30,7 +31,31 @@ const AcmeLogo = () => (
 export default function NavBar() {
   const { logout } = useLogout();
   const { state } = useContext(AuthContext);
+  const { state: bookState, dispatchb } = useBookContext();
   const { role } = state;
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/books", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error("Something went wrong!");
+        }
+        const data = await response.json();
+        dispatchb({ type: "FETCH_BOOKS", payload: data });
+      } catch (error) {
+        dispatchb({ type: "FETCH_BOOKS_ERROR", payload: error.message });
+      }
+    };
+    fetchBooks();
+  }, []);
+
   return (
     <Navbar>
       <NavbarBrand>
@@ -57,7 +82,6 @@ export default function NavBar() {
               Books
             </Link>
           </NavbarItem>
-        
         )}
 
         <NavbarItem>
@@ -66,7 +90,10 @@ export default function NavBar() {
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <a href="https://github.com/sai2wwe/LMS" target="blank">
+          <a
+            href="https://github.com/sai2wwe/Library-Management-System"
+            target="blank"
+          >
             GitHub
           </a>
         </NavbarItem>
@@ -85,14 +112,8 @@ export default function NavBar() {
                 src="bookcover1.jpg"
               />
             </DropdownTrigger>
-            <DropdownMenu
-              aria-label="Profile Actions"
-              variant="flat"
-            >
-              <DropdownItem
-                key="profile"
-                color="secondary"
-              >
+            <DropdownMenu aria-label="Profile Actions" variant="flat">
+              <DropdownItem key="profile" color="secondary">
                 <p className="font-semibold">Signed in as</p>
                 <p className="font-semibold">{state.user.username}</p>
               </DropdownItem>
@@ -116,7 +137,7 @@ export default function NavBar() {
           </Dropdown>
         </NavbarContent>
       ) : (
-        <NavbarContent justify="end" as='div'>
+        <NavbarContent justify="end" as="div">
           <NavbarItem>
             <Button variant="shadow" color="secondary" size="sm">
               <Link to="/signup" color="secondary">

@@ -22,6 +22,7 @@ export default function AdminDashboard() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
         },
       });
       if (!response.ok) {

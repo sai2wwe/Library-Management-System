@@ -12,14 +12,10 @@ import {
   Button,
   useDisclosure,
   Input,
-  Chip,
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Divider,
-  Image,
+  Chip, 
+  Card, CardHeader, CardBody, CardFooter, Divider, Image
 } from "@nextui-org/react";
+import { toast } from "sonner";
 
 export default function Query() {
   const { state, dispatchb } = useBookContext();
@@ -28,9 +24,7 @@ export default function Query() {
   const location = useLocation();
   const bookId = location.pathname.split("/")[2];
   const book = state.books.find((book) => book._id == bookId);
-  console.table(book);
-  const queries = book.queries;
-  console.log(queries);
+  const queries  = book.queries;
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [backdrop, setBackdrop] = useState("blur");
   const [query, setQuery] = useState("");
@@ -45,51 +39,53 @@ export default function Query() {
       const response = await fetch(
         `http://localhost:5000/api/books/${bookId}/query`,
         {
-          method: "PATCH",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "authorization": `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify({ user_name: user.username, query }),
         }
       );
       if (!response.ok) {
-        console.log("Something went wrong!");
+        toast.error("Failed to add query");
+        return;
       }
       const data = await response.json();
       dispatchb({ type: "ADD_QUERY", payload: { bookId, query: data } });
       setQuery("");
+      toast.success("Query added successfully");
       onClose();
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to add query");
     }
   };
   // return a card with queries and answers in a list
   return (
     <>
       <Card className="m-8">
-        <CardHeader>Queries</CardHeader>
+        <CardHeader>
+          Queries
+        </CardHeader>
         <CardBody>
-          {queries.length > 0 ? (
-            queries.map((query) => (
-              <div key={query._id} className="flex flex-col m-2 p-2">
-                <Chip color="primary" size="sm" className="font-serif">
-                  {query.user_name}
-                </Chip>
-                <p className="text-lg">{query.query}</p>
-                <Divider />
-                <Button color="success" variant="flat" className="mt-2">
-                  <Link to={`/books/${bookId}/query/${query._id}`}>
-                    View Answers
-                  </Link>
-                </Button>
-              </div>
-            ))
-          ) : (
-            <h1>No Queries</h1>
-          )}
+          {queries.map((query) => (
+            <div key={query._id} className="flex flex-col m-2 p-2">
+              <Chip color="primary" size="sm" className="font-serif">{query.user_name}</Chip>
+              <p className="text-lg">{query.query}</p>
+              <Divider />
+              <Button color="success" variant="flat" className="mt-2"
+
+              >
+                <Link to={`/books/${bookId}/query/${query._id}`}>
+                  View Answers
+                </Link>
+              </Button>
+
+            </div>
+          ))}
         </CardBody>
       </Card>
-
+      
       <Button
         className="fixed bottom-4 right-4"
         color="primary"
@@ -102,11 +98,14 @@ export default function Query() {
         onOpenChange={onOpenChange}
         placement="center"
         backdrop="blur"
+        
       >
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Ask a Query</ModalHeader>
+              <ModalHeader>
+                Ask a Query
+              </ModalHeader>
               <ModalBody>
                 <Input
                   autoFocus

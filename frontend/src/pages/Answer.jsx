@@ -14,11 +14,11 @@ import {
   ModalFooter,
   Input,
   useDisclosure,
-  ScrollShadow,
 } from "@nextui-org/react";
 import { useLocation } from "react-router-dom";
 import { useBookContext } from "../hooks/useBookContext";
 import { useAuthContext } from "../hooks/useAuthContext";
+import { toast } from "sonner";
 
 export default function Answer() {
   const { state, dispatchb } = useBookContext();
@@ -30,18 +30,19 @@ export default function Answer() {
   const book = state.books.find((book) => book._id == bookId);
   const query = book.queries.find((query) => query._id == queryId);
   const answers = query.answers;
-  console.table(query);
   const [answer, setAnswer] = useState("");
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
-  const handleAnswer = async () => {
-    onOpen();
+  const handleAnswer = async (e) => {
+    // onOpen();
+    // e.preventDefault();
     try {
       const response = await fetch(
         `http://localhost:5000/api/books/${bookId}/query/${queryId}`,
         {
-          method: "PATCH",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "authorization": `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify({ user_name: user.username, answer }),
         }
@@ -61,6 +62,35 @@ export default function Answer() {
       onClose();
     }
   };
+
+  const handleUpvote = async (e, answerId) => {
+    // e.preventDefault();
+    console.table(answers)
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/books/${bookId}/query/${queryId}/`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "authorization": `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ answerId, user_name: user.username}),
+        }
+      );
+      if (!response.ok) {
+        toast.error("Failed to upvote answer ");
+      }
+      const data = await response.json();
+      dispatchb({
+        type: "UPVOTE_ANSWER",
+        payload: { bookId, queryId, answerId, upvote: data },
+      });
+      toast.success("Answer upvoted successfully");
+    } catch (error) {
+      toast.error("Failed to upvote answer");
+    }
+  }
 
   return (
     <>
@@ -87,8 +117,11 @@ export default function Answer() {
                   Answered by: {answer.user_name}
                 </Chip>
                 <p>{answer.answer}</p>
+                <p>upvotes: {answer.upvotes?.count}</p>
+                <Button variant="flat" onPress={(e) => handleUpvote(e, answer._id)}>Upvote</Button>
               </CardBody>
             </Card>
+            // every answer should have a button to upvote
           ))}
           <Button onPress={onOpen} className="mt-4" color="secondary" size="md">
             Answer This Query
@@ -101,7 +134,11 @@ export default function Answer() {
         placement="top-center"
         onClose={onClose}
         title="Answer"
-        backdrop="blur"
+        actions={[
+          <Button onPress={handleAnswer} color="success" key="1">
+            Answer
+          </Button>,
+        ]}
       >
         <ModalContent>
           <ModalHeader>Answer</ModalHeader>
@@ -117,11 +154,7 @@ export default function Answer() {
             <Button color="danger" onPress={onClose} variant="flat">
               Close
             </Button>
-            <Button
-              color="success"
-              onPress={handleAnswer}
-              variant="shadow"
-            >
+            <Button color="success" onPress={handleAnswer} variant="shadow">
               Submit
             </Button>
           </ModalFooter>

@@ -3,10 +3,10 @@ import { useBookContext } from "../hooks/useBookContext";
 
 import { Card, CardBody, CardFooter } from "@nextui-org/react";
 import { Image, Button } from "@nextui-org/react";
-export default function AllBooks() {
+export default function AllBooks({ propbooks }) {
 
   const { state } = useBookContext();
-  const books = state.books;
+  const books = propbooks ? propbooks : state.books;
 return (
     <>
         <div className="container mx-auto">
